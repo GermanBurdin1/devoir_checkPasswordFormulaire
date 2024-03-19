@@ -6,35 +6,37 @@ function isValidEmail(email) {
 }
 
 function isValidPassword(password) {
-  const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  const re =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
   return re.test(password);
 }
 
 user_mail.addEventListener("blur", function () {
   let emailValue = this.value;
   if (!isValidEmail(emailValue)) {
-    document.querySelector("#alerte").innerHTML = "Veuillez entrer une adresse email valide.";
+    document.querySelector("#alerte").innerHTML =
+      "Veuillez entrer une adresse email valide.";
     user_mail.focus();
     return;
   }
 
-  fetch("json_testuser.php", {
+  fetch("ajouteruser.php", {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
     },
-    body: "user_email=" + encodeURIComponent(emailValue)
+    body: "user_email=" + encodeURIComponent(emailValue),
   })
-  .then(response => response.json())
-  .then(result => {
-    if (result.error) {
-      document.querySelector("#alerte").innerHTML = "Cet email existe déjà";
-      user_mail.focus();
-    } else {
-      document.querySelector("#alerte").innerHTML = "";
-    }
-  })
-  .catch(error => console.error('Error:', error));
+    .then((response) => response.json())
+    .then((result) => {
+      if (result.error) {
+        document.querySelector("#alerte").innerHTML = result.message;
+        user_mail.focus();
+      } else {
+        document.querySelector("#alerte").innerHTML = "";
+      }
+    })
+    .catch((error) => console.error("Error:", error));
 });
 
 let pwd1 = document.querySelector("#password");
@@ -73,13 +75,11 @@ btn_submit.addEventListener("click", function (e) {
 
   if (pwd1.value === pwd2.value) {
     let formData = new FormData(document.querySelector("#formulaire"));
+    formData.append("user_email", emailValue);
 
-    fetch("json_testuser.php", {
+    fetch("ajouteruser.php", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: "user_email=" + encodeURIComponent(emailValue),
+      body: formData,
     })
       .then((response) => response.json())
       .then((data) => {
